@@ -1,0 +1,34 @@
+{
+  "name": "redeemer",
+  "type": "module",
+  "version": "1.0.0",
+  "homepage": "https://benmosher.github.io/redeemer/",
+  "description": "",
+  "keywords": [],
+  "main": "src/index.tsx",
+  "dependencies": {
+    "@blackbox-vision/react-qr-reader": "^5.0.0",
+    "immer": "^10.1.1",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "use-immer": "^0.11.0"
+  },
+  "devDependencies": {
+    "@types/react": "19.0.0",
+    "@types/react-dom": "19.0.0",
+    "@vitejs/plugin-react": "^5.0.2",
+    "loader-utils": "3.2.1",
+    "typescript": "5.7.2",
+    "vite": "^7.1.4"
+  },
+  "scripts": {
+    "start": "vite",
+    "build": "vite build"
+  },
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not ie <= 11",
+    "not op_mini all"
+  ]
+}
