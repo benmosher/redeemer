@@ -1,18 +1,30 @@
 import "./styles.css";
-import React from "react";
+import React, { useEffect } from "react";
 import { useImmer } from "use-immer";
-import { QrReader } from "@blackbox-vision/react-qr-reader";
+import { BrowserQRCodeReader, IScannerControls } from "@zxing/browser";
 
 export default function App() {
   const [data, setData] = useImmer<string[]>([]);
-  return (
-    <div className="m-5">
-      <h1 className="text-3xl">REDEEMER</h1>
-      <QrReader
-        videoStyle={{ display: "none" }}
-        constraints={{ facingMode: "user" }}
-        onResult={(result, error) => {
-          if (!!result) {
+
+  useEffect(() => {
+    let controls: IScannerControls;
+
+    async function startScanner() {
+      const codeReader = new BrowserQRCodeReader();
+      const devices = await BrowserQRCodeReader.listVideoInputDevices();
+      devices.forEach((element) => {
+        console.log(element);
+      });
+
+      const previewElem = document.querySelector(
+        "#test-area-qr-code-webcam > video"
+      ) as HTMLVideoElement;
+
+      controls = await codeReader.decodeFromVideoDevice(
+        undefined,
+        previewElem,
+        (result, error) => {
+          if (result) {
             const text = result.getText();
             setData((draft) => {
               if (!draft.includes(text)) {
@@ -20,12 +32,21 @@ export default function App() {
               }
             });
           }
+        }
+      );
+    }
+    startScanner();
 
-          if (!!error) {
-            console.info(error);
-          }
-        }}
-      />
+    return () => {
+      controls?.stop();
+    };
+  }, []);
+  return (
+    <div>
+      <h1 className="text-3xl">REDEEMER</h1>
+      <div id="test-area-qr-code-webcam" style={{ display: "block" }}>
+        <video style={{ width: "100%" }}></video>
+      </div>
       <h2>Results</h2>
       <ul>
         {data.map((item, index) => (
