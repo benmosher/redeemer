@@ -37,6 +37,7 @@ export default function App() {
             setData((draft) => {
               if (!draft.includes(text)) {
                 draft.push(text);
+                navigator.vibrate?.([100, 100, 300]);
               }
             });
           }
