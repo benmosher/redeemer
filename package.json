@@ -8,6 +8,7 @@
   "main": "src/index.tsx",
   "dependencies": {
     "@zxing/browser": "^0.1.5",
+    "@zxing/library": "^0.21.3",
     "immer": "^10.1.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",

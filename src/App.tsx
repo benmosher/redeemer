@@ -1,7 +1,8 @@
 import "./styles.css";
 import React, { useEffect } from "react";
 import { useImmer } from "use-immer";
-import { BrowserQRCodeReader, IScannerControls } from "@zxing/browser";
+import { BrowserQRCodeReader, type IScannerControls } from "@zxing/browser";
+import { DecodeHintType } from "@zxing/library";
 
 // https://marvel.bb.io/c/AWZRXTHAEY
 const REDEEM_BASE = "https://www.marvel.com/redeem?redeemcode=";
@@ -11,6 +12,8 @@ function stripCode(url: string): string {
   return url.substring(finalSlash + 1);
 }
 
+const HINTS = new Map<DecodeHintType, any>([[DecodeHintType.TRY_HARDER, true]]);
+
 export default function App() {
   const [data, setData] = useImmer<string[]>([]);
 
@@ -18,10 +21,9 @@ export default function App() {
     let controls: IScannerControls;
 
     async function startScanner() {
-      const codeReader = new BrowserQRCodeReader();
-      const devices = await BrowserQRCodeReader.listVideoInputDevices();
-      devices.forEach((element) => {
-        console.log(element);
+      const codeReader = new BrowserQRCodeReader(HINTS, {
+        delayBetweenScanAttempts: 100,
+        delayBetweenScanSuccess: 500,
       });
 
       const previewElem = document.querySelector(
