@@ -3,6 +3,13 @@ import React, { useEffect } from "react";
 import { useImmer } from "use-immer";
 import { BrowserQRCodeReader, IScannerControls } from "@zxing/browser";
 
+function stripCode(url: string): string {
+  const finalSlash = url.lastIndexOf("/");
+  if (finalSlash >= 0) {
+    return url.substring(finalSlash + 1);
+  }
+}
+
 export default function App() {
   const [data, setData] = useImmer<string[]>([]);
 
@@ -25,7 +32,7 @@ export default function App() {
         previewElem,
         (result, error) => {
           if (result) {
-            const text = result.getText();
+            const text = stripCode(result.getText());
             setData((draft) => {
               if (!draft.includes(text)) {
                 draft.push(text);
