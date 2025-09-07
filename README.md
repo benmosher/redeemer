@@ -14,3 +14,11 @@ Tiny utility to simplify batch scanning Marvel Unlimited codes.
 
 Practical limit of codes to scan at once: _unknown_
 Current record: 2 (lol)
+
+## development
+
+```
+pnpm i
+pnpm create-dev-cert
+pnpm start --host
+```
