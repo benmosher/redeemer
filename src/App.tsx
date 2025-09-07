@@ -1,4 +1,3 @@
-import "./styles.css";
 import React, { useEffect } from "react";
 import { useImmer } from "use-immer";
 import { BrowserQRCodeReader, type IScannerControls } from "@zxing/browser";
@@ -54,14 +53,17 @@ export default function App() {
   }, []);
   return (
     <div>
-      <h1>
-        <a href={REDEEM_BASE + data.join(",")} target="_blank">
-          REDEEM
-        </a>
-      </h1>
-      <div>
-        Scanned {data.length} codes. Latest: {data[data.length - 1] ?? "(none)"}
-      </div>
+      <main className="container">
+        <h1>
+          <a href={REDEEM_BASE + data.join(",")} target="_blank">
+            REDEEM
+          </a>
+        </h1>
+        <div>
+          Scanned {data.length} codes. Latest:{" "}
+          {data[data.length - 1] ?? "(none)"}
+        </div>
+      </main>
       <div id="test-area-qr-code-webcam" style={{ display: "block" }}>
         <video style={{ width: "100%" }}></video>
       </div>

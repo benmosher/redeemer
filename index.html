@@ -12,6 +12,14 @@
 	rel="stylesheet"
 	href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css"
 	>
+	<style>
+		[data-theme=light],
+		:root:not([data-theme=dark]),
+		:host:not([data-theme=dark]) {
+			--pico-primary: #ff0000;
+			--pico-primary-underline: #ff0000;
+		}
+	</style>
 	<script type="module" src="/src/index.tsx"></script>
 </head>
 
