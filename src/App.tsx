@@ -52,19 +52,17 @@ export default function App() {
   }, []);
   return (
     <div>
-      <h1 className="text-3xl">REDEEMER</h1>
+      <h1>
+        <a href={REDEEM_BASE + data.join(",")} target="_blank">
+          REDEEM
+        </a>
+      </h1>
+      <div>
+        Scanned {data.length} codes. Latest: {data[data.length - 1] ?? "(none)"}
+      </div>
       <div id="test-area-qr-code-webcam" style={{ display: "block" }}>
         <video style={{ width: "100%" }}></video>
       </div>
-      <h2>Results</h2>
-      <ul>
-        {data.map((item, index) => (
-          <li key={index}>{item}</li>
-        ))}
-      </ul>
-      <a href={REDEEM_BASE + data.join(",")} target="_blank">
-        Redeem All
-      </a>
     </div>
   );
 }

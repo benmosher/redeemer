@@ -2,5 +2,11 @@
   "short_name": "REDEEMER",
   "name": "REDEEMER",
   "orientation": "portrait-primary",
-  "display": "standalone"
+  "display": "standalone",
+  "icons": [
+    {
+      "src": "icon.png",
+      "type": "image/png"
+    }
+  ]
 }
