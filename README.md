@@ -13,7 +13,7 @@ Tiny utility to simplify batch scanning Marvel Unlimited codes.
 3. When all codes are scanned, click `REDEEM` on top to kick over to the redemption page, redeeming all scanned codes at once.
 
 Practical limit of codes to scan at once: _unknown_
-Current record: 2 (lol)
+Current record: 5
 
 ## development
 
