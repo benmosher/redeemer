@@ -3,11 +3,12 @@ import React, { useEffect } from "react";
 import { useImmer } from "use-immer";
 import { BrowserQRCodeReader, IScannerControls } from "@zxing/browser";
 
+// https://marvel.bb.io/c/AWZRXTHAEY
+const REDEEM_BASE = "https://www.marvel.com/redeem?redeemcode=";
+
 function stripCode(url: string): string {
   const finalSlash = url.lastIndexOf("/");
-  if (finalSlash >= 0) {
-    return url.substring(finalSlash + 1);
-  }
+  return url.substring(finalSlash + 1);
 }
 
 export default function App() {
@@ -60,6 +61,9 @@ export default function App() {
           <li key={index}>{item}</li>
         ))}
       </ul>
+      <a href={REDEEM_BASE + data.join(",")} target="_blank">
+        Redeem All
+      </a>
     </div>
   );
 }
