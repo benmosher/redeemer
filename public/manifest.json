@@ -2,6 +2,7 @@
   "short_name": "REDEEMER",
   "name": "REDEEMER",
   "orientation": "portrait-primary",
+  "start_url": "https://benmosher.github.io/redeemer/",
   "display": "standalone",
   "icons": [
     {
