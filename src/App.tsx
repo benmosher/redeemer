@@ -93,6 +93,9 @@ export default function App() {
             </li>
           ))}
         </ul>
+        <button onClick={() => setBatches([])} disabled={batches.length === 0}>
+          Clear
+        </button>
       </details>
     </>
   );
