@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useCallback, useEffect } from "react";
 import { useImmer } from "use-immer";
 import { BrowserQRCodeReader, type IScannerControls } from "@zxing/browser";
 import { DecodeHintType } from "@zxing/library";
@@ -15,6 +15,7 @@ const HINTS = new Map<DecodeHintType, any>([[DecodeHintType.TRY_HARDER, true]]);
 
 export default function App() {
   const [data, setData] = useImmer<string[]>([]);
+  const [batches, setBatches] = useImmer<string[][]>([]);
 
   useEffect(() => {
     let controls: IScannerControls;
@@ -51,22 +52,48 @@ export default function App() {
       controls?.stop();
     };
   }, []);
+
+  const handleRedeem = useCallback(() => {
+    // No-op if no codes
+    if (data.length === 0) {
+      return;
+    }
+
+    window.open(REDEEM_BASE + data.join(","), "_blank");
+
+    // capture the last batch
+    setBatches((draft) => {
+      draft.push(data);
+    });
+    setData(() => []);
+  }, [data]);
+
   return (
-    <div>
-      <main className="container">
-        <h1>
-          <a href={REDEEM_BASE + data.join(",")} target="_blank">
-            REDEEM
-          </a>
-        </h1>
-        <div>
-          Scanned {data.length} codes. Latest:{" "}
-          {data[data.length - 1] ?? "(none)"}
-        </div>
-      </main>
-      <div id="test-area-qr-code-webcam" style={{ display: "block" }}>
+    <>
+      <section>
+        <button onClick={handleRedeem}>REDEEM</button>
+      </section>
+      <section>
+        Scanned {data.length} codes. Latest: {data[data.length - 1] ?? "(none)"}
+      </section>
+      <details id="test-area-qr-code-webcam" open>
+        <summary>Camera Preview</summary>
         <video style={{ width: "100%" }}></video>
-      </div>
-    </div>
+      </details>
+      <details>
+        <summary>Previous Scans</summary>
+        <ul>
+          {batches.map((batch, index) => (
+            <li key={index}>
+              {batch.join(", ")} (
+              <a href={REDEEM_BASE + batch.join(",")} target="_blank">
+                retry
+              </a>
+              )
+            </li>
+          ))}
+        </ul>
+      </details>
+    </>
   );
 }
