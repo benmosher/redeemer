@@ -2,3 +2,4 @@ node_modules/
 .tool-versions
 .cert/
 build/
+.pnpm-store/
