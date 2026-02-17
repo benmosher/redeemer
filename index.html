@@ -12,6 +12,17 @@
 	rel="stylesheet"
 	href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.red.min.css"
 	>
+	<style>
+		@keyframes scan-flash {
+			0%, 100% { background-color: inherit; }
+			25% { background-color: red; }
+			50% { background-color: inherit; }
+			75% { background-color: red; }
+		}
+		body.scan-flash {
+			animation: scan-flash 0.4s ease-out;
+		}
+	</style>
 	<script type="module" src="/src/index.tsx"></script>
 </head>
 

@@ -6,6 +6,23 @@ import { DecodeHintType } from "@zxing/library";
 // https://marvel.bb.io/c/AWZRXTHAEY
 const REDEEM_BASE = "https://www.marvel.com/redeem?redeemcode=";
 
+function createBeep(): () => void {
+  let audioCtx: AudioContext | null = null;
+  return () => {
+    if (!audioCtx) audioCtx = new AudioContext();
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.frequency.value = 1800;
+    gain.gain.value = 0.3;
+    osc.start();
+    osc.stop(audioCtx.currentTime + 0.1);
+  };
+}
+
+const beep = createBeep();
+
 function stripCode(url: string): string {
   const finalSlash = url.lastIndexOf("/");
   return url.substring(finalSlash + 1);
@@ -39,7 +56,9 @@ export default function App() {
             setData((draft) => {
               if (!draft.includes(text)) {
                 draft.push(text);
-                navigator.vibrate?.([100, 100, 300]);
+                beep();
+                document.body.classList.add("scan-flash");
+                setTimeout(() => document.body.classList.remove("scan-flash"), 400);
               }
             });
           }
