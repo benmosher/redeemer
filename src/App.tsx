@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from "react";
+import React, { useCallback, useEffect, useRef } from "react";
 import { useImmer } from "use-immer";
 import { BrowserQRCodeReader, type IScannerControls } from "@zxing/browser";
 import { DecodeHintType } from "@zxing/library";
@@ -34,9 +34,9 @@ export default function App() {
   const [data, setData] = useImmer<string[]>([]);
   const [batches, setBatches] = useImmer<string[][]>([]);
 
-  useEffect(() => {
-    let controls: IScannerControls;
+  const controlsRef = useRef<IScannerControls | null>(null);
 
+  useEffect(() => {
     async function startScanner() {
       const codeReader = new BrowserQRCodeReader(HINTS, {
         delayBetweenScanAttempts: 100,
@@ -47,7 +47,7 @@ export default function App() {
         "#test-area-qr-code-webcam > video"
       ) as HTMLVideoElement;
 
-      controls = await codeReader.decodeFromVideoDevice(
+      controlsRef.current = await codeReader.decodeFromVideoDevice(
         undefined,
         previewElem,
         (result, error) => {
@@ -68,8 +68,53 @@ export default function App() {
     startScanner();
 
     return () => {
-      controls?.stop();
+      controlsRef.current?.stop();
+      controlsRef.current = null;
     };
+  }, []);
+
+  // Pause/resume scanner when page visibility changes (e.g. iOS PWA popover)
+  useEffect(() => {
+    function handleVisibility() {
+      if (document.hidden) {
+        controlsRef.current?.stop();
+        controlsRef.current = null;
+      } else {
+        // Restart scanner when page becomes visible again
+        const codeReader = new BrowserQRCodeReader(HINTS, {
+          delayBetweenScanAttempts: 100,
+          delayBetweenScanSuccess: 500,
+        });
+        const previewElem = document.querySelector(
+          "#test-area-qr-code-webcam > video"
+        ) as HTMLVideoElement;
+
+        codeReader
+          .decodeFromVideoDevice(undefined, previewElem, (result, error) => {
+            if (result) {
+              const text = stripCode(result.getText());
+              setData((draft) => {
+                if (!draft.includes(text)) {
+                  draft.push(text);
+                  beep();
+                  document.body.classList.add("scan-flash");
+                  setTimeout(
+                    () => document.body.classList.remove("scan-flash"),
+                    400
+                  );
+                }
+              });
+            }
+          })
+          .then((controls) => {
+            controlsRef.current = controls;
+          });
+      }
+    }
+
+    document.addEventListener("visibilitychange", handleVisibility);
+    return () =>
+      document.removeEventListener("visibilitychange", handleVisibility);
   }, []);
 
   const handleRedeem = useCallback(() => {
