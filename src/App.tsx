@@ -30,6 +30,16 @@ function stripCode(url: string): string {
 
 const HINTS = new Map<DecodeHintType, any>([[DecodeHintType.TRY_HARDER, true]]);
 
+// Prefer the rear camera at higher resolution so damaged/small codes have
+// enough pixel density for zxing to lock on.
+const VIDEO_CONSTRAINTS: MediaStreamConstraints = {
+  video: {
+    facingMode: { ideal: "environment" },
+    width: { ideal: 1920 },
+    height: { ideal: 1080 },
+  },
+};
+
 export default function App() {
   const [data, setData] = useImmer<string[]>([]);
   const [batches, setBatches] = useImmer<string[][]>([]);
@@ -47,8 +57,8 @@ export default function App() {
         "#test-area-qr-code-webcam > video"
       ) as HTMLVideoElement;
 
-      controlsRef.current = await codeReader.decodeFromVideoDevice(
-        undefined,
+      controlsRef.current = await codeReader.decodeFromConstraints(
+        VIDEO_CONSTRAINTS,
         previewElem,
         (result, error) => {
           if (result) {
@@ -90,7 +100,7 @@ export default function App() {
         ) as HTMLVideoElement;
 
         codeReader
-          .decodeFromVideoDevice(undefined, previewElem, (result, error) => {
+          .decodeFromConstraints(VIDEO_CONSTRAINTS, previewElem, (result, error) => {
             if (result) {
               const text = stripCode(result.getText());
               setData((draft) => {
