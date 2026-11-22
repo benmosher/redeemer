@@ -4,7 +4,7 @@ import { BrowserQRCodeReader, type IScannerControls } from "@zxing/browser";
 import { DecodeHintType } from "@zxing/library";
 
 // https://marvel.bb.io/c/AWZRXTHAEY
-const REDEEM_BASE = "https://www.marvel.com/redeem?redeemcode=";
+const REDEEM_BASE = "https://www.marvelcomicsapp.com/redeem?code=";
 
 function createBeep(): () => void {
   let audioCtx: AudioContext | null = null;
