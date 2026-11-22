@@ -5,6 +5,8 @@ import { DecodeHintType } from "@zxing/library";
 
 // https://marvel.bb.io/c/AWZRXTHAEY
 const REDEEM_BASE = "https://www.marvelcomicsapp.com/redeem?code=";
+// The redeem page rejects more than this many codes per submission.
+const MAX_BATCH = 10;
 
 function createBeep(): () => void {
   let audioCtx: AudioContext | null = null;
@@ -44,6 +46,11 @@ export default function App() {
   const [data, setData] = useImmer<string[]>([]);
   const [batches, setBatches] = useImmer<string[][]>([]);
 
+  // Scanner callbacks are bound once, so read batches through a ref to
+  // skip codes that were already sent for redemption.
+  const batchesRef = useRef(batches);
+  batchesRef.current = batches;
+
   const controlsRef = useRef<IScannerControls | null>(null);
 
   useEffect(() => {
@@ -64,7 +71,10 @@ export default function App() {
           if (result) {
             const text = stripCode(result.getText());
             setData((draft) => {
-              if (!draft.includes(text)) {
+              if (
+                !draft.includes(text) &&
+                !batchesRef.current.some((batch) => batch.includes(text))
+              ) {
                 draft.push(text);
                 beep();
                 document.body.classList.add("scan-flash");
@@ -104,7 +114,10 @@ export default function App() {
             if (result) {
               const text = stripCode(result.getText());
               setData((draft) => {
-                if (!draft.includes(text)) {
+                if (
+                  !draft.includes(text) &&
+                  !batchesRef.current.some((batch) => batch.includes(text))
+                ) {
                   draft.push(text);
                   beep();
                   document.body.classList.add("scan-flash");
@@ -133,22 +146,31 @@ export default function App() {
       return;
     }
 
-    window.open(REDEEM_BASE + data.join(","), "_blank");
+    const batch = data.slice(0, MAX_BATCH);
+    window.open(REDEEM_BASE + batch.join(","), "_blank");
 
-    // capture the last batch
+    // capture the batch and leave the remainder pending for the next press
     setBatches((draft) => {
-      draft.push(data);
+      draft.push(batch);
     });
-    setData(() => []);
+    setData(data.slice(MAX_BATCH));
   }, [data]);
+
+  const nextBatchSize = Math.min(data.length, MAX_BATCH);
+  const remaining = data.length - nextBatchSize;
+  const batchesToGo = Math.ceil(data.length / MAX_BATCH);
 
   return (
     <>
       <section>
-        <button onClick={handleRedeem}>REDEEM</button>
+        <button onClick={handleRedeem} disabled={data.length === 0}>
+          REDEEM{nextBatchSize > 0 && ` ${nextBatchSize}`}
+          {remaining > 0 && ` (${remaining} left)`}
+        </button>
       </section>
       <section>
-        Scanned {data.length} codes. Latest: {data[data.length - 1] ?? "(none)"}
+        Scanned {data.length} codes
+        {batchesToGo > 1 && `, ${batchesToGo} batches to go`}. Latest: {data[data.length - 1] ?? "(none)"}
       </section>
       <details id="test-area-qr-code-webcam" open>
         <summary>Camera Preview</summary>
